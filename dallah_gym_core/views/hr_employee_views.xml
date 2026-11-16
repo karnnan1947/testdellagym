@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_employee_form_gym_coach" model="ir.ui.view">
+        <field name="name">hr.employee.form.gym.coach</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Coach Branch &amp; Split Shift Schedule" name="gym_coach_schedule">
+                    <group>
+                        <group>
+                            <field name="is_coach"/>
+                            <field name="booking_horizon_days" invisible="not is_coach"/>
+                        </group>
+                        <group invisible="not is_coach">
+                            <field name="allowed_branch_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <field name="coach_shift_ids" invisible="not is_coach">
+                        <list editable="bottom">
+                            <field name="day_of_week"/>
+                            <field name="shift_type"/>
+                            <field name="branch_id"/>
+                            <field name="start_hour" widget="float_time"/>
+                            <field name="end_hour" widget="float_time"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_gym_coaches" model="ir.actions.act_window">
+        <field name="name">Coaches</field>
+        <field name="res_model">hr.employee</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('is_coach', '=', True)]</field>
+        <field name="context">{'default_is_coach': True}</field>
+    </record>
+</odoo>

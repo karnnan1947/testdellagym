@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_gym_member" model="ir.ui.view">
+        <field name="name">res.partner.form.gym.member</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header invisible="not is_gym_member">
+                    <button name="action_push_to_zkbio" type="object" string="🔄 Push Updates to ZKBio"
+                            groups="dallah_gym_core.group_gym_manager"
+                            invisible="membership_state not in ('active', 'frozen')"/>
+                    <button name="action_open_freeze_wizard" type="object" string="❄️ Freeze Membership"
+                            groups="dallah_gym_core.group_gym_receptionist"
+                            invisible="membership_state != 'active'"/>
+                    <button name="action_open_refund_wizard" type="object" string="⛔ Pro-Rata Refund"
+                            groups="dallah_gym_core.group_gym_manager"
+                            invisible="membership_state not in ('active', 'frozen')"/>
+                </header>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_pt_sessions" type="object" class="oe_stat_button" icon="fa-calendar"
+                        invisible="not is_gym_member">
+                    <span class="o_stat_text">PT Sessions</span>
+                </button>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="after">
+                <div class="float-end" invisible="not is_gym_member">
+                    <span class="me-1">Status:</span>
+                    <field name="membership_state" widget="badge"
+                           decoration-success="membership_state == 'active'"
+                           decoration-info="membership_state == 'frozen'"
+                           decoration-danger="membership_state in ('expired', 'cancelled')"/>
+                </div>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Gym Membership &amp; Gate Access" name="gym_membership">
+                    <group>
+                        <group>
+                            <field name="is_gym_member"/>
+                            <field name="member_id_code" invisible="not is_gym_member"/>
+                            <field name="qid_number"/>
+                        </group>
+                        <group invisible="not is_gym_member">
+                            <field name="current_membership_id" string="Active Plan" readonly="1"/>
+                            <label for="membership_end_date" string="Expires"/>
+                            <div class="o_row">
+                                <field name="membership_end_date" readonly="1"/>
+                                <span invisible="membership_state != 'active'">(<field name="days_remaining" class="oe_inline"/> Days Left)</span>
+                            </div>
+                        </group>
+                    </group>
+                    <group invisible="not is_gym_member">
+                        <field name="allowed_branch_ids" string="Allowed Turnstiles" widget="many2many_checkboxes"/>
+                    </group>
+                    <group string="ZKBio Biometric Sync" invisible="not is_gym_member" groups="dallah_gym_core.group_gym_manager">
+                        <group>
+                            <field name="zkbio_person_id"/>
+                            <field name="zkbio_synced"/>
+                        </group>
+                        <group>
+                            <field name="zkbio_last_sync" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook invisible="not is_gym_member">
+                        <page string="Gate Check-in History" name="gate_checkins">
+                            <field name="checkin_ids" readonly="1">
+                                <list limit="20" decoration-success="access_result == 'granted'" decoration-danger="access_result == 'denied'">
+                                    <field name="checkin_time"/>
+                                    <field name="branch_id"/>
+                                    <field name="device_identifier"/>
+                                    <field name="verification_mode"/>
+                                    <field name="access_result" widget="badge"
+                                           decoration-success="access_result == 'granted'"
+                                           decoration-danger="access_result == 'denied'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Memberships" name="gym_memberships">
+                            <field name="gym_membership_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="product_id"/>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Freeze History" name="freeze_history">
+                            <field name="freeze_log_ids" readonly="1">
+                                <list>
+                                    <field name="membership_id"/>
+                                    <field name="freeze_start_date"/>
+                                    <field name="freeze_end_date"/>
+                                    <field name="freeze_days"/>
+                                    <field name="reason"/>
+                                    <field name="processed_by"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_res_partner_filter_gym" model="ir.ui.view">
+        <field name="name">res.partner.search.gym</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="member_id_code"/>
+                <field name="qid_number"/>
+            </xpath>
+            <xpath expr="//search" position="inside">
+                <filter name="gym_members" string="Gym Members" domain="[('is_gym_member', '=', True)]"/>
+                <filter name="gym_active" string="Active Members" domain="[('membership_state', '=', 'active')]"/>
+                <filter name="gym_frozen" string="Frozen Members" domain="[('membership_state', '=', 'frozen')]"/>
+                <filter name="gym_expired" string="Expired Members" domain="[('membership_state', '=', 'expired')]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_gym_members" model="ir.actions.act_window">
+        <field name="name">Members</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_gym_members': 1, 'default_is_gym_member': True, 'default_is_company': False}</field>
+    </record>
+</odoo>

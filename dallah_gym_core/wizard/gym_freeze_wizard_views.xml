@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_gym_membership_freeze_wizard_form" model="ir.ui.view">
+        <field name="name">gym.membership.freeze.wizard.form</field>
+        <field name="model">gym.membership.freeze.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Freeze Membership">
+                <group>
+                    <group>
+                        <field name="partner_id"/>
+                        <field name="membership_id" readonly="1"/>
+                        <field name="current_end_date"/>
+                    </group>
+                    <group>
+                        <field name="freeze_start_date"/>
+                        <field name="freeze_end_date"/>
+                        <field name="freeze_days"/>
+                        <field name="new_end_date"/>
+                    </group>
+                </group>
+                <field name="reason" placeholder="Reason (e.g. vacation, travel, medical)..."/>
+                <footer>
+                    <button name="action_confirm_freeze" type="object" string="Confirm Freeze" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

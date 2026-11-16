@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_gym_pt_session_calendar" model="ir.ui.view">
+        <field name="name">gym.pt.session.calendar</field>
+        <field name="model">gym.pt.session</field>
+        <field name="arch" type="xml">
+            <calendar string="PT Sessions" date_start="start_datetime" date_stop="stop_datetime"
+                      color="coach_id" mode="week" event_open_popup="1" quick_create="0">
+                <field name="partner_id"/>
+                <field name="coach_id" filters="1"/>
+                <field name="branch_id" filters="1"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_gym_pt_session_list" model="ir.ui.view">
+        <field name="name">gym.pt.session.list</field>
+        <field name="model">gym.pt.session</field>
+        <field name="arch" type="xml">
+            <list multi_edit="1">
+                <field name="session_date"/>
+                <field name="start_hour" widget="float_time"/>
+                <field name="end_hour" widget="float_time" optional="hide"/>
+                <field name="partner_id"/>
+                <field name="coach_id"/>
+                <field name="branch_id"/>
+                <field name="session_number" optional="show"/>
+                <field name="membership_id" optional="hide"/>
+                <field name="state" widget="badge" decoration-info="state == 'scheduled'"
+                       decoration-warning="state == 'ongoing'" decoration-success="state == 'done'"
+                       decoration-danger="state in ('no_show', 'cancelled')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_gym_pt_session_kanban" model="ir.ui.view">
+        <field name="name">gym.pt.session.kanban</field>
+        <field name="model">gym.pt.session</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <templates>
+                    <t t-name="card">
+                        <field name="partner_id" class="fw-bold"/>
+                        <field name="coach_id"/>
+                        <div>
+                            <field name="session_date"/> &#8212; <field name="start_hour" widget="float_time"/>
+                        </div>
+                        <field name="branch_id"/>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_gym_pt_session_form" model="ir.ui.view">
+        <field name="name">gym.pt.session.form</field>
+        <field name="model">gym.pt.session</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_start" type="object" string="Start" class="btn-primary" invisible="state != 'scheduled'"/>
+                    <button name="action_done" type="object" string="Done" class="btn-primary" invisible="state != 'ongoing'"/>
+                    <button name="action_no_show" type="object" string="No Show" invisible="state != 'scheduled'"/>
+                    <button name="action_cancel" type="object" string="Cancel" invisible="state in ('done', 'cancelled')"/>
+                    <button name="action_reset" type="object" string="Reset to Scheduled" invisible="state not in ('no_show', 'cancelled')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="scheduled,ongoing,done"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="coach_id"/>
+                            <field name="branch_id"/>
+                            <field name="membership_id"/>
+                        </group>
+                        <group>
+                            <field name="session_date"/>
+                            <field name="start_hour" widget="float_time"/>
+                            <field name="end_hour" widget="float_time"/>
+                            <field name="session_number"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_gym_pt_session_search" model="ir.ui.view">
+        <field name="name">gym.pt.session.search</field>
+        <field name="model">gym.pt.session</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="coach_id"/>
+                <field name="branch_id"/>
+                <filter name="today" string="Today" domain="[('session_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="scheduled" string="Scheduled" domain="[('state', '=', 'scheduled')]"/>
+                <filter name="ongoing" string="Ongoing" domain="[('state', '=', 'ongoing')]"/>
+                <filter name="done" string="Done" domain="[('state', '=', 'done')]"/>
+                <filter name="not_cancelled" string="Not Cancelled" domain="[('state', '!=', 'cancelled')]"/>
+                <separator/>
+                <filter name="session_date" string="Date" date="session_date"/>
+                <separator/>
+                <filter name="group_coach" string="Coach" context="{'group_by': 'coach_id'}"/>
+                <filter name="group_branch" string="Branch" context="{'group_by': 'branch_id'}"/>
+                <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                <filter name="group_date" string="Date" context="{'group_by': 'session_date:day'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_gym_pt_session" model="ir.actions.act_window">
+        <field name="name">PT Schedule</field>
+        <field name="res_model">gym.pt.session</field>
+        <field name="view_mode">calendar,list,kanban,form</field>
+        <field name="context">{'search_default_not_cancelled': 1}</field>
+    </record>
+</odoo>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_zkbio" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.zkbio</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="priority">95</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Gym Biometric Turnstile Settings" string="Gym Biometric Turnstile Settings"
+                     name="dallah_gym_zkbio" logo="/dallah_gym_core/static/description/icon.png"
+                     groups="base.group_system">
+                    <block title="ZKBio CVSecurity 6.0.0_R Connection (Allied API)" name="zkbio_connection">
+                        <setting id="zkbio_server" string="Server Host / IP" help="Host IP and REST API port of the ZKBio CVSecurity server.">
+                            <div class="d-flex gap-2 align-items-center">
+                                <field name="zkbio_server_ip" placeholder="192.168.1.100"/>
+                                <span>Port:</span>
+                                <field name="zkbio_server_port" placeholder="8098" class="w-25"/>
+                            </div>
+                        </setting>
+                        <setting id="zkbio_token" string="API Bearer Token" help="Security AppKey / Bearer token and request timeout.">
+                            <div class="d-flex gap-2 align-items-center">
+                                <field name="zkbio_api_token" password="True"/>
+                                <span>Timeout:</span>
+                                <field name="zkbio_timeout" class="w-25"/>
+                                <span>s</span>
+                            </div>
+                        </setting>
+                        <setting id="zkbio_status" string="Connection Status">
+                            <div class="d-flex gap-2 align-items-center">
+                                <field name="zkbio_connection_status" readonly="1"/>
+                                <button name="action_test_zkbio_connection" type="object" string="⚡ Test Connection"
+                                        class="btn-secondary"/>
+                            </div>
+                        </setting>
+                        <setting id="zkbio_webhook" string="Webhook Secret Token"
+                                 help="Header X-ZKBio-Token expected on /zkbio/webhook/event (real-time scan push).">
+                            <field name="zkbio_webhook_secret" password="True"/>
+                        </setting>
+                    </block>
+                    <block title="Branch Gate Door Mapping" name="zkbio_branch_mapping">
+                        <div class="col-12 px-3">
+                            <field name="zkbio_branch_ids" readonly="1" nolabel="1">
+                                <list>
+                                    <field name="name" string="Branch Name"/>
+                                    <field name="zkbio_access_group_id" string="ZKBio Access Group ID"/>
+                                    <field name="zkbio_device_ids" string="Turnstile Devices"/>
+                                </list>
+                            </field>
+                            <button name="action_open_zkbio_branch_mapping" type="object" string="Edit Branch Mapping"
+                                    class="btn-link" icon="oi-arrow-right"/>
+                        </div>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

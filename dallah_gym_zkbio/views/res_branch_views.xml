@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_res_branch_form_zkbio" model="ir.ui.view">
+        <field name="name">res.branch.form.zkbio</field>
+        <field name="model">res.branch</field>
+        <field name="inherit_id" ref="dallah_gym_core.view_res_branch_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='main']" position="after">
+                <group name="zkbio" string="ZKBio Turnstile Gates">
+                    <field name="zkbio_access_group_id" placeholder="e.g. GRP_IZGHAWA_MEN"/>
+                    <field name="zkbio_device_ids" placeholder="e.g. ProFace-BBM-01, ProFace-BBM-02"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_res_branch_zkbio_mapping_list" model="ir.ui.view">
+        <field name="name">res.branch.zkbio.mapping.list</field>
+        <field name="model">res.branch</field>
+        <field name="priority">30</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" create="0" delete="0">
+                <field name="name" string="Branch Name" readonly="1"/>
+                <field name="zkbio_access_group_id"/>
+                <field name="zkbio_device_ids"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_partner_form_zkbio" model="ir.ui.view">
+        <field name="name">res.partner.form.zkbio</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="dallah_gym_core.view_partner_form_gym_member"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='zkbio_person_id']" position="after">
+                <field name="zkbio_card_number"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

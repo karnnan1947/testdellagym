@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <!--
+        Epson LQ-350 continuous 3-ply pre-printed stationery.
+        Only the values are printed: the logo/header (top 120px) and the legal terms
+        (bottom 80px) are already pre-printed on the paper.
+    -->
+    <t t-name="dallah_gym_pos.EpsonLQ350Receipt">
+        <html id="pos-receipt">
+            <head>
+                <meta charset="UTF-8"/>
+                <style>
+                    @page { margin: 0; }
+                    html, body { margin: 0; padding: 0; background: #fff; color: #000; }
+                    .lq350 { font-family: "Courier New", Courier, monospace; font-size: 11px; line-height: 1.6;
+                             padding: 120px 24px 80px 24px; white-space: nowrap; }
+                    .lq350 table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+                    .lq350 td { padding: 2px 0; vertical-align: top; overflow: hidden; text-overflow: ellipsis; }
+                    .lq350 .lbl { width: 11ch; }
+                    .lq350 .val { width: 39ch; }
+                    @media print {
+                        .lq350 { font-size: 11px; padding: 120px 24px 80px 24px; }
+                    }
+                </style>
+            </head>
+            <body>
+                <t t-set="g" t-value="this.extra_data.gym or {}"/>
+                <div class="lq350">
+                    <table>
+                        <tr>
+                            <td class="lbl">Receipt No:</td><td class="val" t-out="g.receipt_no"/>
+                            <td class="lbl">Date:</td><td class="val" t-out="g.date"/>
+                        </tr>
+                        <tr>
+                            <td class="lbl">Member:</td>
+                            <td class="val"><t t-out="g.member_name"/><t t-if="g.member_code"> (<t t-out="g.member_code"/>)</t></td>
+                            <td class="lbl">Coach:</td>
+                            <td class="val"><t t-if="g.coach_name"><t t-out="g.coach_name"/> (<t t-out="g.coach_slot"/>)</t><t t-else="">--</t></td>
+                        </tr>
+                        <tr>
+                            <td class="lbl">Plan:</td><td class="val" t-out="g.plan"/>
+                            <td class="lbl">Validity:</td>
+                            <td class="val"><t t-if="g.start_date"><t t-out="g.start_date"/> to <t t-out="g.end_date"/></t><t t-else="">--</t></td>
+                        </tr>
+                        <tr>
+                            <td class="lbl">Amount:</td>
+                            <td class="val"><t t-out="g.amount"/><t t-if="g.payment_methods"> (<t t-out="g.payment_methods"/>)</t></td>
+                            <td class="lbl">Cashier:</td>
+                            <td class="val"><t t-out="g.cashier_name"/><t t-if="g.branch_name"> (<t t-out="g.branch_name"/>)</t></td>
+                        </tr>
+                    </table>
+                </div>
+            </body>
+        </html>
+    </t>
+</templates>

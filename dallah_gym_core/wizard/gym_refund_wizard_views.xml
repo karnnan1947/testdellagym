@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_gym_membership_refund_wizard_form" model="ir.ui.view">
+        <field name="name">gym.membership.refund.wizard.form</field>
+        <field name="model">gym.membership.refund.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Pro-Rata Refund">
+                <group>
+                    <group>
+                        <field name="partner_id"/>
+                        <field name="membership_id" readonly="1"/>
+                        <field name="cancellation_date"/>
+                        <field name="currency_id" invisible="1"/>
+                    </group>
+                    <group>
+                        <field name="amount_paid"/>
+                        <field name="total_plan_days"/>
+                        <field name="days_consumed"/>
+                        <field name="daily_rate"/>
+                        <field name="calculated_refund_amount" class="fw-bold"/>
+                    </group>
+                </group>
+                <div class="text-muted">Refund = Paid - (Daily Rate × Consumed Days). A draft credit note is created and the membership is terminated.</div>
+                <field name="reason" placeholder="Cancellation reason..."/>
+                <footer>
+                    <button name="action_execute_refund" type="object" string="Execute Refund" class="btn-primary"
+                            confirm="This cancels the membership, revokes turnstile access and creates a credit note. Continue?"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

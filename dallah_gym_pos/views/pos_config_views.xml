@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- POS Settings (Point of Sale > Configuration > Settings, per selected counter) -->
+    <record id="res_config_settings_view_form_gym_pos" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.gym.pos</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='pos_interface_section']" position="before">
+                <block title="Gym Branch &amp; Default Gate Access Settings" id="gym_counter_section">
+                    <setting id="gym_counter_branch" string="Counter Branch"
+                             help="Physical branch of this counter; filters coaches and sets the invoice analytic.">
+                        <field name="pos_gym_branch_id"/>
+                    </setting>
+                    <setting id="gym_dot_matrix" string="Dot-Matrix Printer"
+                             help="Enable Epson LQ-350 Continuous 3-Ply Form Layout">
+                        <field name="pos_use_dot_matrix_receipt"/>
+                    </setting>
+                    <setting id="gym_default_turnstiles" string="Default Allowed Turnstiles"
+                             help="Auto-Selected on Checkout for this Counter">
+                        <field name="pos_default_allowed_branch_ids" widget="many2many_checkboxes"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- pos.config form -->
+    <record id="pos_config_view_form_gym" model="ir.ui.view">
+        <field name="name">pos.config.form.gym</field>
+        <field name="model">pos.config</field>
+        <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Gym Counter Branch &amp; Gate Access Defaults" name="gym_counter_defaults">
+                    <field name="gym_branch_id"/>
+                    <field name="default_allowed_branch_ids" widget="many2many_checkboxes"/>
+                    <field name="use_dot_matrix_receipt"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

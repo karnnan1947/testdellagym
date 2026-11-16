@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="dallah_gym_pos.GymCheckoutModal">
+        <Dialog size="'lg'" contentClass="'o_gym_checkout_modal'">
+            <t t-set-slot="header">
+                <div class="d-flex w-100 justify-content-between align-items-center">
+                    <h4 class="modal-title m-0">✔️ MEMBERSHIP &amp; PT CHECKOUT CONFIRMATION</h4>
+                    <small class="text-muted me-3">Counter: <t t-out="this.counterName"/> (Auto-Detected)</small>
+                </div>
+            </t>
+
+            <div class="o_gym_member mb-3 fs-5">
+                Member: <strong t-out="this.member?.name"/>
+                <t t-if="this.member?.member_id_code"> (<t t-out="this.member.member_id_code"/>)</t>
+            </div>
+
+            <!-- 1. Validity dates -->
+            <section class="mb-3">
+                <h6 class="fw-bold">1. VALIDITY DATES (Auto-Computed):</h6>
+                <div t-foreach="this.gymLines" t-as="line" t-key="line.uuid" class="d-flex flex-wrap align-items-center gap-2 ms-3 mb-1">
+                    <span class="o_gym_plan">• <t t-out="line.getFullProductName()"/></span>
+                    <span>| Start:</span>
+                    <input type="date" class="form-control form-control-sm w-auto" t-att-value="this.state.startDate"
+                           t-on-change="this.onStartDateChange"/>
+                    <span>➔ End:</span>
+                    <span class="badge text-bg-light border fs-6" t-out="this.endDateFor(line)"/>
+                    <small class="text-muted">(Auto)</small>
+                </div>
+            </section>
+
+            <!-- 2. Branch turnstile access -->
+            <section class="mb-3">
+                <h6 class="fw-bold">2. BRANCH TURNSTILE ACCESS (Auto-Selected from <t t-out="this.counterName"/> Config):</h6>
+                <div class="d-flex flex-wrap gap-3 ms-3">
+                    <label t-foreach="this.branches" t-as="branch" t-key="branch.id" class="form-check">
+                        <input type="checkbox" class="form-check-input" t-att-checked="this.isBranchChecked(branch)"
+                               t-on-change="() => this.toggleBranch(branch)"/>
+                        <span class="form-check-label" t-out="branch.display_name or branch.name"/>
+                    </label>
+                </div>
+                <small class="text-muted ms-3">*(Cashier can adjust ticks if needed)*</small>
+            </section>
+
+            <!-- 3. PT slot (only if PT / class in cart) -->
+            <section t-if="this.hasPt" class="mb-2">
+                <h6 class="fw-bold">3. PERSONAL TRAINING SLOT:</h6>
+                <div class="d-flex flex-wrap align-items-center gap-2 ms-3 mb-2">
+                    <span>• Branch:</span>
+                    <select class="form-select form-select-sm w-auto" t-on-change="this.onPtBranchChange">
+                        <option value="">-- Select --</option>
+                        <option t-foreach="this.branches" t-as="branch" t-key="branch.id" t-att-value="branch.id"
+                                t-att-selected="branch.id === this.state.ptBranchId" t-out="branch.name"/>
+                    </select>
+                    <span>| Coach:</span>
+                    <select class="form-select form-select-sm w-auto" t-on-change="this.onCoachChange">
+                        <option value="">-- Select Coach --</option>
+                        <option t-foreach="this.coaches" t-as="coach" t-key="coach.id" t-att-value="coach.id"
+                                t-att-selected="coach.id === this.state.coachId" t-out="coach.name"/>
+                    </select>
+                    <small class="text-muted">(Branch Filtered)</small>
+                    <i t-if="this.state.loadingSlots" class="fa fa-spinner fa-spin"/>
+                </div>
+                <div t-if="this.state.coachId" class="ms-3">
+                    <div class="d-flex flex-wrap align-items-center gap-1 mb-1">
+                        <span class="o_gym_shift_label">• Morning Slots:</span>
+                        <button t-foreach="this.state.slots.morning" t-as="slot" t-key="slot.hour"
+                                class="btn btn-sm o_gym_slot" t-att-class="this.slotClass(slot)"
+                                t-att-title="slot.label" t-on-click="() => this.selectSlot(slot)">
+                            <t t-out="slot.short_label"/> <t t-out="slot.booked ? '🔴' : '🟢'"/>
+                        </button>
+                        <small t-if="!this.state.slots.morning.length" class="text-muted">No morning shift</small>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center gap-1">
+                        <span class="o_gym_shift_label">• Evening Slots:</span>
+                        <button t-foreach="this.state.slots.evening" t-as="slot" t-key="slot.hour"
+                                class="btn btn-sm o_gym_slot" t-att-class="this.slotClass(slot)"
+                                t-att-title="slot.label" t-on-click="() => this.selectSlot(slot)">
+                            <t t-out="slot.short_label"/> <t t-out="slot.booked ? '🔴' : '🟢'"/>
+                            <t t-if="slot.hour === this.state.slotHour"> Selected</t>
+                        </button>
+                        <small t-if="!this.state.slots.evening.length" class="text-muted">No evening shift</small>
+                    </div>
+                </div>
+            </section>
+
+            <div t-if="this.state.error" class="alert alert-danger mt-2 mb-0" t-out="this.state.error"/>
+
+            <t t-set-slot="footer">
+                <button class="btn btn-secondary btn-lg" t-on-click="this.props.close">Back to Cart</button>
+                <button class="btn btn-primary btn-lg" t-on-click="this.confirm">✔️ Confirm &amp; Proceed to Payment</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

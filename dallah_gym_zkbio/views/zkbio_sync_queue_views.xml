@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_zkbio_sync_queue_list" model="ir.ui.view">
+        <field name="name">zkbio.sync.queue.list</field>
+        <field name="model">zkbio.sync.queue</field>
+        <field name="arch" type="xml">
+            <list create="0" decoration-success="state == 'done'" decoration-warning="state == 'pending'"
+                  decoration-danger="state == 'failed'">
+                <header>
+                    <button name="action_retry_now" type="object" string="Retry Now"/>
+                </header>
+                <field name="create_date" string="Queued On"/>
+                <field name="partner_id"/>
+                <field name="action_type"/>
+                <field name="retry_count"/>
+                <field name="last_attempt"/>
+                <field name="error_message" optional="show"/>
+                <field name="state" widget="badge" decoration-success="state == 'done'"
+                       decoration-warning="state == 'pending'" decoration-danger="state == 'failed'"/>
+                <button name="action_retry_now" type="object" string="Retry Now" icon="fa-refresh"
+                        invisible="state == 'done'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_zkbio_sync_queue_form" model="ir.ui.view">
+        <field name="name">zkbio.sync.queue.form</field>
+        <field name="model">zkbio.sync.queue</field>
+        <field name="arch" type="xml">
+            <form create="0">
+                <header>
+                    <button name="action_retry_now" type="object" string="Retry Now" class="btn-primary"
+                            invisible="state == 'done'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="action_type" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="retry_count" readonly="1"/>
+                            <field name="last_attempt" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Last Error">
+                        <field name="error_message" nolabel="1" readonly="1"/>
+                    </group>
+                    <group string="Payload">
+                        <field name="payload_json" nolabel="1" readonly="1" widget="ace" options="{'mode': 'json'}"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_zkbio_sync_queue_search" model="ir.ui.view">
+        <field name="name">zkbio.sync.queue.search</field>
+        <field name="model">zkbio.sync.queue</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <filter name="not_done" string="Pending / Failed" domain="[('state', '!=', 'done')]"/>
+                <filter name="failed" string="Failed" domain="[('state', '=', 'failed')]"/>
+                <separator/>
+                <filter name="group_action" string="Action" context="{'group_by': 'action_type'}"/>
+                <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_zkbio_sync_queue" model="ir.actions.act_window">
+        <field name="name">ZKBio Sync Queue</field>
+        <field name="res_model">zkbio.sync.queue</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_not_done': 1}</field>
+    </record>
+
+    <menuitem id="menu_zkbio_sync_queue" name="ZKBio Sync Queue" parent="dallah_gym_core.menu_gym_config"
+              action="action_zkbio_sync_queue" sequence="50"/>
+</odoo>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_gym_member_checkin_list" model="ir.ui.view">
+        <field name="name">gym.member.checkin.list</field>
+        <field name="model">gym.member.checkin</field>
+        <field name="arch" type="xml">
+            <list create="0" decoration-success="access_result == 'granted'" decoration-danger="access_result == 'denied'">
+                <field name="checkin_time"/>
+                <field name="partner_id"/>
+                <field name="branch_id"/>
+                <field name="device_identifier"/>
+                <field name="verification_mode"/>
+                <field name="access_result" widget="badge" decoration-success="access_result == 'granted'"
+                       decoration-danger="access_result == 'denied'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_gym_member_checkin_search" model="ir.ui.view">
+        <field name="name">gym.member.checkin.search</field>
+        <field name="model">gym.member.checkin</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="branch_id"/>
+                <field name="device_identifier"/>
+                <filter name="granted" string="Granted" domain="[('access_result', '=', 'granted')]"/>
+                <filter name="denied" string="Denied" domain="[('access_result', '=', 'denied')]"/>
+                <separator/>
+                <filter name="today" string="Today" domain="[('checkin_time', '&gt;=', 'today')]"/>
+                <filter name="checkin_time" string="Date" date="checkin_time"/>
+                <separator/>
+                <filter name="group_branch" string="Branch" context="{'group_by': 'branch_id'}"/>
+                <filter name="group_day" string="Day" context="{'group_by': 'checkin_time:day'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_gym_member_checkin" model="ir.actions.act_window">
+        <field name="name">Gate Check-ins</field>
+        <field name="res_model">gym.member.checkin</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

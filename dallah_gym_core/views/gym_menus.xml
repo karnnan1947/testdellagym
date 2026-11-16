@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_gym_root" name="Gym" sequence="25" web_icon="dallah_gym_core,static/description/icon.png"
+              groups="dallah_gym_core.group_gym_cashier"/>
+
+    <menuitem id="menu_gym_operations" name="Operations" parent="menu_gym_root" sequence="10"/>
+    <menuitem id="menu_gym_members" name="Members" parent="menu_gym_operations" action="action_gym_members" sequence="10"/>
+    <menuitem id="menu_gym_memberships" name="Memberships" parent="menu_gym_operations" action="action_gym_membership" sequence="20"/>
+    <menuitem id="menu_gym_checkins" name="Gate Check-ins" parent="menu_gym_operations" action="action_gym_member_checkin" sequence="30"/>
+
+    <menuitem id="menu_gym_pt" name="PT Schedule" parent="menu_gym_root" sequence="20"/>
+    <menuitem id="menu_gym_pt_board" name="PT Reception Floor Board" parent="menu_gym_pt" action="action_gym_pt_reception_board" sequence="10"/>
+    <menuitem id="menu_gym_pt_sessions" name="PT Sessions (Calendar / List)" parent="menu_gym_pt" action="action_gym_pt_session" sequence="20"/>
+
+    <menuitem id="menu_gym_config" name="Configuration" parent="menu_gym_root" sequence="90"
+              groups="dallah_gym_core.group_gym_manager"/>
+    <menuitem id="menu_gym_branches" name="Branches" parent="menu_gym_config" action="action_res_branch" sequence="10"/>
+    <menuitem id="menu_gym_plans" name="Membership Plans" parent="menu_gym_config" action="action_gym_membership_products" sequence="20"/>
+    <menuitem id="menu_gym_coaches" name="Coaches" parent="menu_gym_config" action="action_gym_coaches" sequence="30"/>
+</odoo>

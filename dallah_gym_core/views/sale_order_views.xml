@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_gym" model="ir.ui.view">
+        <field name="name">sale.order.form.gym</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payment_term_id']" position="before">
+                <field name="branch_id" readonly="state in ('sale', 'cancel')"/>
+            </xpath>
+            <xpath expr="//list[@name='sol_list']/column[@name='sol_qty']" position="before">
+                <field name="is_gym_membership" column_invisible="1"/>
+                <field name="membership_type" column_invisible="1"/>
+                <field name="membership_start_date" optional="show" invisible="not is_gym_membership"
+                       required="is_gym_membership"/>
+                <field name="membership_end_date" optional="show" invisible="not is_gym_membership"/>
+                <field name="coach_id" optional="show" invisible="membership_type not in ('pt', 'class')"
+                       options="{'no_create': True}"
+                       domain="[('is_coach', '=', True)] + ([('allowed_branch_ids', 'in', [parent.branch_id])] if parent.branch_id else [])"/>
+                <field name="pt_slot_hour" string="Slot" widget="float_time" optional="show"
+                       invisible="membership_type not in ('pt', 'class')"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Gym Gate Access &amp; Scheduling" name="gym_gate_access">
+                    <group>
+                        <field name="allowed_branch_ids" string="Permitted Turnstile Branches"
+                               widget="many2many_checkboxes" readonly="state in ('sale', 'cancel')"/>
+                    </group>
+                    <button name="action_check_coach_slots" type="object" string="📅 Check Coach Slot Availability"
+                            class="btn-secondary" invisible="state in ('sale', 'cancel')"/>
+                    <field name="gym_membership_ids" invisible="state != 'sale'" readonly="1">
+                        <list>
+                            <field name="name"/>
+                            <field name="product_id"/>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="state" widget="badge"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

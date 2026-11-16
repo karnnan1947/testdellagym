@@ -1,0 +1,17 @@
+id,name,model_id,group_id/id,operation,domain
+access_res_branch_user,res.branch user,res.branch,base.group_user,r,
+access_res_branch_manager,res.branch manager,res.branch,group_gym_manager,crud,
+access_hr_employee_coach_shift_cashier,hr.employee.coach.shift cashier,hr.employee.coach.shift,group_gym_cashier,r,
+access_hr_employee_coach_shift_manager,hr.employee.coach.shift manager,hr.employee.coach.shift,group_gym_manager,crud,
+access_hr_employee_coach_shift_hr,hr.employee.coach.shift hr,hr.employee.coach.shift,hr.group_hr_user,crud,
+access_gym_membership_cashier,Gym Membership: own branches,gym.membership,group_gym_cashier,cru,"['|', ('branch_id', '=', False), ('branch_id', 'in', user.gym_branch_ids.ids)]"
+access_gym_membership_manager,Gym Membership: all branches,gym.membership,group_gym_manager,crud,
+access_gym_membership_freeze_log_cashier,gym.membership.freeze.log cashier,gym.membership.freeze.log,group_gym_cashier,r,
+access_gym_membership_freeze_log_receptionist,gym.membership.freeze.log receptionist,gym.membership.freeze.log,group_gym_receptionist,cru,
+access_gym_membership_freeze_log_manager,gym.membership.freeze.log manager,gym.membership.freeze.log,group_gym_manager,crud,
+access_gym_pt_session_cashier,PT Session: own branches,gym.pt.session,group_gym_cashier,cru,"['|', ('branch_id', '=', False), ('branch_id', 'in', user.gym_branch_ids.ids)]"
+access_gym_pt_session_manager,PT Session: all branches,gym.pt.session,group_gym_manager,crud,
+access_gym_member_checkin_cashier,Gate Check-in: own branches,gym.member.checkin,group_gym_cashier,r,"['|', ('branch_id', '=', False), ('branch_id', 'in', user.gym_branch_ids.ids)]"
+access_gym_member_checkin_manager,Gate Check-in: all branches,gym.member.checkin,group_gym_manager,crud,
+access_gym_membership_freeze_wizard,gym.membership.freeze.wizard,gym.membership.freeze.wizard,group_gym_receptionist,crud,
+access_gym_membership_refund_wizard,gym.membership.refund.wizard,gym.membership.refund.wizard,group_gym_manager,crud,

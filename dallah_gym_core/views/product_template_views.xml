@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_template_form_view_gym" model="ir.ui.view">
+        <field name="name">product.template.form.gym</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Gym Membership Settings" name="gym_membership_settings">
+                    <group>
+                        <group>
+                            <field name="is_gym_membership"/>
+                            <field name="membership_type" invisible="not is_gym_membership" required="is_gym_membership"/>
+                            <label for="membership_duration_val" invisible="not is_gym_membership"/>
+                            <div class="o_row" invisible="not is_gym_membership">
+                                <field name="membership_duration_val" class="oe_inline"/>
+                                <field name="membership_duration_unit" class="oe_inline"/>
+                            </div>
+                        </group>
+                        <group invisible="not is_gym_membership">
+                            <field name="pt_total_sessions" invisible="membership_type not in ('pt', 'class')"/>
+                            <field name="reminder_days_before"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_template_search_view_gym" model="ir.ui.view">
+        <field name="name">product.template.search.gym</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter name="gym_membership" string="Gym Memberships" domain="[('is_gym_membership', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_gym_membership_products" model="ir.actions.act_window">
+        <field name="name">Membership Plans</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_gym_membership': 1, 'default_is_gym_membership': True, 'default_type': 'service'}</field>
+    </record>
+</odoo>

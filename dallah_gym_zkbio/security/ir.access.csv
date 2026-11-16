@@ -1,0 +1,4 @@
+id,name,model_id,group_id/id,operation,domain
+access_zkbio_sync_queue_receptionist,zkbio.sync.queue receptionist,zkbio.sync.queue,dallah_gym_core.group_gym_receptionist,r,
+access_zkbio_sync_queue_manager,zkbio.sync.queue manager,zkbio.sync.queue,dallah_gym_core.group_gym_manager,crud,
+access_zkbio_sync_queue_system,zkbio.sync.queue system,zkbio.sync.queue,base.group_system,crud,

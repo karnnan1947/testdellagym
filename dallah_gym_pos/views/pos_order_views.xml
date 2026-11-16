@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_pos_pos_form_gym" model="ir.ui.view">
+        <field name="name">pos.order.form.gym</field>
+        <field name="model">pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Gym Membership &amp; Gate Access" name="gym_membership">
+                    <group>
+                        <group>
+                            <field name="gym_branch_id"/>
+                            <field name="gym_membership_finalized" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="allowed_branch_ids" string="Permitted Gate Branches" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <field name="lines" readonly="1" nolabel="1">
+                        <list>
+                            <field name="full_product_name"/>
+                            <field name="qty"/>
+                            <field name="membership_start_date"/>
+                            <field name="membership_end_date"/>
+                            <field name="coach_id"/>
+                            <field name="pt_slot_hour" widget="float_time"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

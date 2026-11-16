@@ -1,0 +1,33 @@
+.o_gym_pt_board {
+    background-color: $o-view-background-color;
+
+    .o_gym_kpi {
+        border-radius: 0.5rem;
+    }
+
+    .o_gym_grid {
+        td {
+            min-width: 120px;
+            vertical-align: middle;
+        }
+        .o_gym_cell_free {
+            background-color: rgba($success, 0.08);
+        }
+        .o_gym_cell_booked {
+            background-color: rgba($danger, 0.08);
+        }
+        .o_gym_state_ongoing {
+            background-color: rgba($warning, 0.18);
+        }
+        .o_gym_state_done {
+            background-color: rgba($info, 0.12);
+        }
+        .o_gym_cell_off {
+            background-color: rgba($gray-500, 0.12);
+        }
+        .o_gym_cell_highlight {
+            background-color: rgba($primary, 0.25);
+            font-weight: bold;
+        }
+    }
+}

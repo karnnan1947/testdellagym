@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dallah_gym_core.PtReceptionDashboard">
+        <div class="o_gym_pt_board o_action h-100 overflow-auto p-3">
+            <t t-if="this.state.data">
+                <!-- Toolbar -->
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                    <h3 class="m-0 me-3">PT Reception Floor Board</h3>
+                    <select class="form-select w-auto" t-on-change="this.onBranchChange">
+                        <t t-foreach="this.state.data.branches" t-as="b" t-key="b.id">
+                            <option t-att-value="b.id" t-att-selected="b.id === this.state.branchId" t-out="b.name"/>
+                        </t>
+                    </select>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" t-on-click="() => this.shiftDay(-1)"><i class="oi oi-chevron-left"/></button>
+                        <input type="date" class="form-control" t-att-value="this.state.date" t-on-change="this.onDateChange"/>
+                        <button class="btn btn-secondary" t-on-click="() => this.shiftDay(1)"><i class="oi oi-chevron-right"/></button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" t-att-class="this.state.shift === 'morning' ? 'btn-primary' : 'btn-secondary'"
+                                t-on-click="() => this.setShift('morning')">Morning</button>
+                        <button class="btn" t-att-class="this.state.shift === 'evening' ? 'btn-primary' : 'btn-secondary'"
+                                t-on-click="() => this.setShift('evening')">Evening</button>
+                    </div>
+                    <input type="search" class="form-control w-auto flex-grow-1" placeholder="Search member name or code..."
+                           t-att-value="this.state.search" t-on-input="this.onSearch"/>
+                    <button class="btn btn-secondary" t-on-click="this.openCalendar"><i class="fa fa-calendar me-1"/>Calendar View</button>
+                </div>
+
+                <!-- KPI ribbon -->
+                <div class="row g-3 mb-3">
+                    <div class="col-4">
+                        <div class="o_gym_kpi card p-3 text-center">
+                            <div class="text-muted">Total Today</div>
+                            <div class="fs-2 fw-bold" t-out="this.state.data.kpi.total_today"/>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="o_gym_kpi card p-3 text-center">
+                            <div class="text-muted">Free Slots</div>
+                            <div class="fs-2 fw-bold text-success" t-out="this.state.data.kpi.free_slots"/>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="o_gym_kpi card p-3 text-center">
+                            <div class="text-muted">Ongoing</div>
+                            <div class="fs-2 fw-bold text-warning" t-out="this.state.data.kpi.ongoing"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick book panel -->
+                <div t-if="this.state.booking" class="card p-3 mb-3 border-primary">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <strong>Quick Book:</strong>
+                        <span t-out="this.state.booking.coach_name"/> &#8212; <span t-out="this.state.booking.label"/>
+                        <button class="btn btn-link ms-auto" t-on-click="this.cancelQuickBook">Cancel</button>
+                    </div>
+                    <input type="search" class="form-control" placeholder="Type member name, code or QID..."
+                           t-att-value="this.state.memberQuery" t-on-input="this.onMemberQuery"/>
+                    <div class="list-group mt-2">
+                        <button t-foreach="this.state.memberResults" t-as="m" t-key="m[0]"
+                                class="list-group-item list-group-item-action" t-on-click="() => this.confirmQuickBook(m)"
+                                t-out="m[1]"/>
+                    </div>
+                </div>
+
+                <!-- Hourly grid -->
+                <table class="table table-bordered o_gym_grid">
+                    <thead>
+                        <tr>
+                            <th>Coach</th>
+                            <th t-foreach="this.hours" t-as="h" t-key="h.hour" class="text-center" t-out="h.label"/>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-if="!this.rows.length">
+                            <td t-att-colspan="this.hours.length + 1" class="text-center text-muted">No coaches assigned to this branch.</td>
+                        </tr>
+                        <tr t-foreach="this.rows" t-as="row" t-key="row.coach_id">
+                            <td class="fw-bold" t-out="row.coach_name"/>
+                            <td t-foreach="row.cells" t-as="cell" t-key="cell.hour" class="text-center" t-att-class="this.cellClass(cell)">
+                                <t t-if="cell.session_id">
+                                    <a href="#" t-on-click.prevent="() => this.openSession(cell)">
+                                        <div t-out="cell.member"/>
+                                        <small class="text-muted" t-out="cell.member_code"/>
+                                    </a>
+                                </t>
+                                <t t-elif="cell.available">
+                                    <button class="btn btn-sm btn-outline-success" t-on-click="() => this.startQuickBook(row, cell)">
+                                        <i class="fa fa-plus"/> Quick Book
+                                    </button>
+                                </t>
+                                <t t-else="">
+                                    <small class="text-muted">Off shift</small>
+                                </t>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </t>
+        </div>
+    </t>
+</templates>

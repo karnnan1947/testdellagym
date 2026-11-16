@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="mail_template_gym_renewal_reminder" model="mail.template">
+        <field name="name">Gym: Membership Renewal Reminder</field>
+        <field name="model_id" ref="model_gym_membership"/>
+        <field name="subject">Your {{ object.product_id.name }} membership expires on {{ object.end_date }}</field>
+        <field name="email_from">{{ (object.company_id.email_formatted or user.email_formatted) }}</field>
+        <field name="email_to">{{ object.partner_id.email_formatted }}</field>
+        <field name="lang">{{ object.partner_id.lang }}</field>
+        <field name="auto_delete" eval="True"/>
+        <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px;">
+    <p>Dear <t t-out="object.partner_id.name or ''"/>,</p>
+    <p>
+        Your membership <strong t-out="object.product_id.name or ''"/>
+        (member code <t t-out="object.partner_id.member_id_code or ''"/>)
+        expires on <strong t-out="object.end_date or ''"/>
+        (<t t-out="object.days_remaining or 0"/> days left).
+    </p>
+    <p>Visit any branch counter to renew and keep your turnstile access active.</p>
+    <p>Best regards,<br/><t t-out="object.company_id.name or ''"/></p>
+</div>
+        </field>
+    </record>
+</odoo>
