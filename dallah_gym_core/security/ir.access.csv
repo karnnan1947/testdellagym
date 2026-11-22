@@ -15,3 +15,4 @@ access_gym_member_checkin_cashier,Gate Check-in: own branches,gym.member.checkin
 access_gym_member_checkin_manager,Gate Check-in: all branches,gym.member.checkin,group_gym_manager,crud,
 access_gym_membership_freeze_wizard,gym.membership.freeze.wizard,gym.membership.freeze.wizard,group_gym_receptionist,crud,
 access_gym_membership_refund_wizard,gym.membership.refund.wizard,gym.membership.refund.wizard,group_gym_manager,crud,
+restrict_sale_order_branch,Sales Order: own branches,sale.order,,crud,"['|', ('branch_id', '=', False), ('branch_id', 'in', user.gym_access_branch_ids.ids)]"

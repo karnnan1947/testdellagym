@@ -14,8 +14,41 @@ class PosOrder(models.Model):
         string='Permitted Gate Branches')
     gym_membership_finalized = fields.Boolean(copy=False)
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        # Every order (cafe included) carries its counter's branch: branch rules and branch P&L rely on it
+        for vals in vals_list:
+            if not vals.get('gym_branch_id'):
+                session = self.env['pos.session'].browse(vals.get('session_id'))
+                config = session.config_id if session else self.env['pos.config']
+                vals['gym_branch_id'] = config.gym_branch_id.id or False
+        return super().create(vals_list)
+
+    @api.model
+    def _check_gym_slots_from_ui(self, order):
+        """Last-resort guard: reject the order when another terminal took the coach slot.
+
+        The POS already re-checks the slots when the cashier clicks Validate (see
+        PaymentValidationHook.js); this only covers the tiny window between that check and the sync.
+        """
+        data = order.get('lines') or []
+        Service = self.env['gym.membership.service']
+        branch_id = order.get('gym_branch_id')
+        if isinstance(branch_id, (list, tuple)):
+            branch_id = branch_id[0] if branch_id else False
+        if not branch_id and order.get('session_id'):
+            branch_id = self.env['pos.session'].browse(order['session_id']).config_id.gym_branch_id.id
+        lines = []
+        for command in data:
+            vals = command[2] if isinstance(command, (list, tuple)) and len(command) > 2 else {}
+            if (vals.get('qty') or 0) > 0:
+                lines.append(vals)
+        Service.check_slots(branch_id, lines)
+
     @api.model
     def _process_order(self, order, existing_order):
+        if not existing_order:
+            self._check_gym_slots_from_ui(order)
         order_id = super()._process_order(order, existing_order)
         pos_order = self.browse(order_id) if isinstance(order_id, int) else order_id
         if pos_order and pos_order.state in ('paid', 'done', 'invoiced'):

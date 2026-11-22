@@ -35,23 +35,9 @@ class SaleOrder(models.Model):
         Service = self.env['gym.membership.service']
         for order in self:
             for line in order.order_line.filtered(lambda l: l.product_id.is_gym_membership):
-                tmpl = line.product_id.product_tmpl_id
-                if tmpl.membership_type not in ('pt', 'class') or not tmpl.pt_total_sessions:
-                    continue
-                if not line.coach_id:
-                    raise ValidationError(self.env._("Please select a coach for %s.", line.product_id.display_name))
-                slots = Service.get_branch_coach_slots(
-                    order.branch_id.id, line.coach_id.id, line.membership_start_date,
-                    tmpl.pt_total_sessions, line.membership_end_date)
-                slot = next((s for s in slots['morning'] + slots['evening'] if s['hour'] == line.pt_slot_hour), None)
-                if not slot:
-                    raise ValidationError(self.env._(
-                        "%(coach)s does not work at the selected slot for %(product)s.",
-                        coach=line.coach_id.name, product=line.product_id.display_name))
-                if slot['booked']:
-                    raise ValidationError(self.env._(
-                        "%(coach)s is already booked at %(slot)s. Please choose another slot.",
-                        coach=line.coach_id.name, slot=slot['label']))
+                Service.assert_coach_slot_free(
+                    order.branch_id.id, line.coach_id, line.product_id,
+                    line.membership_start_date, line.membership_end_date, line.pt_slot_hour)
 
     def action_check_coach_slots(self):
         self._check_gym_coach_slots()

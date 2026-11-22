@@ -12,9 +12,9 @@ the web client and the external API use:
                         and pivot/graph measures.  (Odoo 20: the field is *not*
                         popped any more -- a field referenced by a view arch but
                         missing from ``fields_get`` crashes the Owl client.)
-* ``read()``         -> the value is replaced by ``0.0``.  ``web_read``,
-                        ``web_search_read``, ``search_read`` and ``web_save``
-                        all go through ``read()``.
+* ``_read_format()`` -> the value is replaced by ``0.0``.  ``read()``, ``search_read()``
+                        and (through them) ``web_read``, ``web_search_read`` and ``web_save``
+                        all end in ``_read_format()``.
 * ``formatted_read_group()`` / ``formatted_read_grouping_sets()``
                      -> every aggregate (``field:sum`` ...) is forced to 0.0.
                         These replace ``read_group`` (now ``@typing.final``)
@@ -79,8 +79,10 @@ class RestrictedCostMixin(models.AbstractModel):
                 desc.pop("aggregator", None)
         return res
 
-    def read(self, fields=None, load="_classic_read"):
-        res = super().read(fields=fields, load=load)
+    def _read_format(self, fnames, load="_classic_read"):
+        # Odoo 20: read() and search_read() both end in _read_format(); search_read() does not call
+        # read(), so redacting here is the only place that covers every read channel.
+        res = super()._read_format(fnames, load=load)
         if self._restricted_cost_fields and self._is_cost_restricted():
             restricted = set(self._restricted_cost_fields)
             for values in res:

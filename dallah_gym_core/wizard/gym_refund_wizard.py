@@ -60,6 +60,8 @@ class GymMembershipRefundWizard(models.TransientModel):
         membership = self.membership_id
         if membership.state not in ('active', 'frozen'):
             raise UserError(self.env._("Only active or frozen memberships can be refunded."))
+        # never trust the stored figures: the web client does not send read-only computed fields
+        self._compute_refund()
         invoice = self._get_source_invoice()
         line_vals = {
             'product_id': membership.product_id.id,
@@ -73,6 +75,16 @@ class GymMembershipRefundWizard(models.TransientModel):
             if src_line:
                 line_vals['tax_ids'] = [(6, 0, src_line.tax_ids.ids)]
                 line_vals['account_id'] = src_line.account_id.id
+                # The original invoice keeps releasing the unused part to income until its deferral
+                # end date. Deferring the refund over that same remaining period (the day after the
+                # cancellation until the original end) releases the opposite amount each month, so
+                # revenue stops growing for a cancelled plan.
+                def_end = src_line.deferred_end_date
+                if def_end and src_line.deferred_start_date:
+                    def_start = max(fields.Date.add(self.cancellation_date, days=1), src_line.deferred_start_date)
+                    if def_start <= def_end:
+                        line_vals['deferred_start_date'] = def_start
+                        line_vals['deferred_end_date'] = def_end
         credit_note = self.env['account.move'].create({
             'move_type': 'out_refund',
             'partner_id': membership.partner_id.id,

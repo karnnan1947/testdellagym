@@ -28,6 +28,7 @@
                         <group>
                             <field name="code" placeholder="e.g. BBM"/>
                             <field name="analytic_account_id"/>
+                            <field name="warehouse_id"/>
                         </group>
                         <group>
                             <field name="company_id" groups="base.group_multi_company"/>

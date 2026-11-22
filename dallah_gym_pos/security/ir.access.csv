@@ -1,0 +1,2 @@
+id,name,model_id,group_id/id,operation,domain
+restrict_pos_order_branch,POS Order: own branches,pos.order,,crud,"['|', ('gym_branch_id', '=', False), ('gym_branch_id', 'in', user.gym_access_branch_ids.ids)]"

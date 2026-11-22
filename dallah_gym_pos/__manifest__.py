@@ -14,6 +14,7 @@ Epson LQ-350 Dot-Matrix Receipt Printing (DES00144).
     'license': 'OPL-1',
     'depends': ['point_of_sale', 'pos_hr', 'dallah_gym_core', 'restricted_cost_access'],
     'data': [
+        'security/ir.access.csv',
         'views/pos_config_views.xml',
         'views/pos_order_views.xml',
     ],
@@ -22,12 +23,10 @@ Epson LQ-350 Dot-Matrix Receipt Printing (DES00144).
             'dallah_gym_pos/static/src/js/models.js',
             'dallah_gym_pos/static/src/js/GymCheckoutModal.js',
             'dallah_gym_pos/static/src/js/PaymentScreenHook.js',
+            'dallah_gym_pos/static/src/js/PaymentValidationHook.js',
             'dallah_gym_pos/static/src/xml/GymCheckoutModal.xml',
             'dallah_gym_pos/static/src/xml/EpsonLQ350Receipt.xml',
             'dallah_gym_pos/static/src/scss/pos_custom.scss',
-        ],
-        'web.assets_tests': [
-            'dallah_gym_pos/static/tests/tours/**/*',
         ],
     },
     'installable': True,

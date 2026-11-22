@@ -14,7 +14,7 @@ Turnstile Check-in Model & Dual PT Dashboards (DES00143).
     'license': 'OPL-1',
     'depends': [
         'base', 'contacts', 'sale_management', 'account', 'account_accountant',
-        'hr', 'mail', 'resource', 'restricted_cost_access',
+        'hr', 'mail', 'resource', 'stock', 'restricted_cost_access',
     ],
     'data': [
         'security/gym_security.xml',

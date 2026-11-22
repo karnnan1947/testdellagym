@@ -115,6 +115,41 @@ class GymMembershipService(models.AbstractModel):
                 })
         return result
 
+    @api.model
+    def assert_coach_slot_free(self, branch_id, coach, product, start_date, end_date, slot_hour):
+        """Raise ValidationError when the PT/class slot cannot be booked (shared by Sales and POS)."""
+        tmpl = product.product_tmpl_id
+        if tmpl.membership_type not in ('pt', 'class') or not tmpl.pt_total_sessions:
+            return
+        if not coach:
+            raise ValidationError(self.env._("Please select a coach for %s.", product.display_name))
+        slots = self.get_branch_coach_slots(
+            branch_id, coach.id, start_date, tmpl.pt_total_sessions, end_date)
+        slot = next((s for s in slots['morning'] + slots['evening'] if s['hour'] == slot_hour), None)
+        if not slot:
+            raise ValidationError(self.env._(
+                "%(coach)s does not work at the selected slot for %(product)s.",
+                coach=coach.name, product=product.display_name))
+        if slot['booked']:
+            raise ValidationError(self.env._(
+                "%(coach)s is already booked at %(slot)s. Please choose another slot.",
+                coach=coach.name, slot=slot['label']))
+
+    @api.model
+    def check_slots(self, branch_id, lines):
+        """Validate the PT/class slots of POS order lines (dicts with product_id, coach_id,
+        pt_slot_hour, membership_start_date, membership_end_date). Raises ValidationError."""
+        for vals in lines or []:
+            if not vals.get('product_id') or not vals.get('pt_slot_hour'):
+                continue
+            product = self.env['product.product'].browse(vals['product_id']).exists()
+            if not product or not product.is_gym_membership:
+                continue
+            coach = self.env['hr.employee'].sudo().browse(vals.get('coach_id') or 0).exists()
+            self.assert_coach_slot_free(
+                branch_id, coach, product, vals.get('membership_start_date'),
+                vals.get('membership_end_date'), vals['pt_slot_hour'])
+
     # ------------------------------------------------------------------
     # Finalize a sale (Sales Order confirmation or POS payment)
     # ------------------------------------------------------------------
@@ -123,7 +158,11 @@ class GymMembershipService(models.AbstractModel):
                                  branch=None, coach=None, slot_hour=0.0, amount_paid=0.0,
                                  sale_line=None, pos_line_id=False, invoice=None):
         """Create gym.membership, generate PT sessions, update member, trigger gate sync."""
-        Membership = self.env['gym.membership']
+        # The caller may be a branch cashier without write rights on contacts: a paid sale must
+        # always create its membership, so work on sudo copies of the records handed in.
+        partner = partner.sudo()
+        product = product.sudo()
+        Membership = self.env['gym.membership'].sudo()
         branch = branch or self.env['res.branch']
         allowed_branches = allowed_branches or self.env['res.branch']
         coach = coach or self.env['hr.employee']

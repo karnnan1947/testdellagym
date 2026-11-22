@@ -16,8 +16,8 @@ To guarantee that data cannot be leaked through the UI, exported, or extracted v
 Using standard Odoo view inheritance, the module locates specific `div`s, `field`s, and `column`s in the XML layout and appends the `groups="restricted_cost_access.group_manager_cost"` attribute. 
 * **Result:** The web client physically removes these elements from the HTML DOM, preventing the user from seeing them on the screen.
 
-### 2. Standard Data Retrieval (`read()`)
-The module overrides the standard ORM `read()` method on relevant models. 
+### 2. Standard Data Retrieval (`_read_format()` – used by `read()` and `search_read()`)
+The module overrides the ORM `_read_format()` method on relevant models (Odoo 20: `search_read()` does not call `read()`, both end in `_read_format()`).
 * **Result:** If an unauthorized user attempts to read a cost field, the backend intercepts the request and overwrites the returned dictionary value to `0.0`. This protects against custom views or API calls trying to fetch the raw database value.
 
 ### 3. Aggregations & Pivot Tables (`formatted_read_group()`, `formatted_read_grouping_sets()`)

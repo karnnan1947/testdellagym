@@ -21,6 +21,9 @@ class ResBranch(models.Model):
     analytic_account_id = fields.Many2one(
         'account.analytic.account', string='Analytic Account',
         help='Analytic account set on invoice lines of sales made at this branch.')
+    warehouse_id = fields.Many2one(
+        'stock.warehouse', string='Warehouse', check_company=True,
+        help='Stock of this branch. POS shops of the branch must use an operation type of this warehouse.')
     default_allowed_branch_ids = fields.Many2many(
         'res.branch', 'res_branch_default_access_rel', 'branch_id', 'allowed_branch_id',
         string='Default Turnstile Access Policy',

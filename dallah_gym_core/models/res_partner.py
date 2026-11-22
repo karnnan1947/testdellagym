@@ -37,6 +37,29 @@ class ResPartner(models.Model):
         for partner in self:
             partner.membership_state = partner.current_membership_id.state or 'none'
 
+    def _gym_remaining_access_memberships(self, exclude=None):
+        """Other memberships of the member that still give gate access (active, not excluded)."""
+        self.ensure_one()
+        return self.gym_membership_ids.filtered(
+            lambda m: m.state == 'active' and m not in (exclude or self.env['gym.membership']))
+
+    def _gym_repoint_current_membership(self, exclude=None):
+        """Make the best remaining active membership the member's current one.
+
+        Gate access is per member (one ZKBio person), so it must follow the member's
+        remaining plans, not the single plan that was just refunded / frozen / expired.
+        Gym-access plans win over PT/class, then the one ending last.
+        Returns that membership (empty recordset when none is left).
+        """
+        self.ensure_one()
+        remaining = self._gym_remaining_access_memberships(exclude)
+        if not remaining:
+            return remaining
+        best = remaining.sorted(lambda m: (m.membership_type == 'gym', m.end_date or m.start_date))[-1]
+        if self.current_membership_id != best:
+            self.current_membership_id = best
+        return best
+
     def _compute_days_remaining(self):
         today = fields.Date.context_today(self)
         for partner in self:

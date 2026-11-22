@@ -116,6 +116,11 @@ class GymMembership(models.Model):
         expired = self.search([('state', '=', 'active'), ('end_date', '<', today)])
         if expired:
             expired.write({'state': 'expired'})
+            # the gate end_time follows the member's current plan: switch to a plan that is still active
+            for partner in expired.partner_id.filtered(lambda p: p.current_membership_id in expired):
+                best = partner._gym_repoint_current_membership(exclude=expired)
+                if best:
+                    best._gym_gate_push()
         return True
 
     @api.model
